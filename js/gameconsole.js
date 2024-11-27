@@ -2,29 +2,21 @@ function GameConsole(documentId) {
     const deltaTime = 33;
 
     let canvas = document.getElementById(documentId);
-    if (!canvas) {
-        throw new Error(`Canvas element with ID '${documentId}' not found.`);
-    }
     let context = canvas.getContext("2d");
 
+    // TODO: detect window resize
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
     let entities = [];
     let mouseMoveListeners = [];
 
-    canvas.addEventListener("mousemove", function(evt) {
+    canvas.addEventListener('mousemove', function(evt) {
         let rect = canvas.getBoundingClientRect();
         let position = [evt.clientX - rect.left, evt.clientY - rect.top];
         mouseMoveListeners.forEach(function(listener) {
             listener.onMouseMove(position);
         });
-    });
-
-    window.addEventListener("resize", function() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        clearView();
     });
 
     function clearView() {
@@ -48,26 +40,19 @@ function GameConsole(documentId) {
     function eventLoop() {
         update();
         render();
-        requestAnimationFrame(eventLoop); // Use requestAnimationFrame
+        setTimeout(eventLoop, deltaTime);
     }
 
     this.start = function() {
-        requestAnimationFrame(eventLoop); // Start the loop with requestAnimationFrame
+        setTimeout(eventLoop, deltaTime);
     };
 
     this.addEntity = function(entity) {
-        if (entity.init) {
-            entity.init(canvas.width, canvas.height);
-        }
+        entity.init(canvas.width, canvas.height);
         entities.push(entity);
     };
 
     this.addMouseMoveListener = function(listener) {
         mouseMoveListeners.push(listener);
     };
-
-    this.getEntities = function() {
-        return entities; // Expose entities safely
-    };
-    
 }
